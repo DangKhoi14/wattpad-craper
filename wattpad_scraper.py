@@ -6,11 +6,9 @@ import time
 import random
 from urllib.parse import quote, urlparse, urljoin
 
-# Cấu hình
 OUTPUT_DIR = "wattpad_chapters"
-MAX_RETRIES = 3  # Số lần thử lại nếu gặp lỗi kết nối
+MAX_RETRIES = 3
 
-# --- KHỞI TẠO SCRAPER VỚI HEADERS CỦA BẠN ---
 scraper = cloudscraper.create_scraper(
     browser={
         'browser': 'chrome',
@@ -58,7 +56,6 @@ def extract_text_from_pre(soup: BeautifulSoup) -> str:
 
 def get_next_url(soup: BeautifulSoup) -> str | None:
     """Tìm link đến chương tiếp theo (Next Part)."""
-    # Dựa trên HTML bạn gửi, Wattpad thường để link chương tiếp theo ở thẻ 'a' class 'next-part-link'
     next_link = soup.find("a", class_=re.compile(r"next-part-link|continue-link", re.I))
     if next_link and next_link.get("href"):
         return urljoin("https://www.wattpad.com", next_link["href"])
@@ -75,7 +72,6 @@ def fetch_with_retry(url, max_retries=5):
     safe_url = clean_url(url)
     for i in range(max_retries):
         try:
-            # Giả lập thời gian suy nghĩ của con người trước khi click
             wait = random.uniform(3, 7)
             time.sleep(wait)
             
@@ -96,7 +92,7 @@ def scrape_chapter_content(url: str):
     all_text = []
     current_page_url = url
     last_valid_soup = None
-    first_soup = None  # <-- thêm
+    first_soup = None
 
     while current_page_url:
         print(f"    Đang tải trang: {current_page_url}")
@@ -109,8 +105,8 @@ def scrape_chapter_content(url: str):
         soup = BeautifulSoup(resp.text, "html.parser")
         last_valid_soup = soup
 
-        if first_soup is None:  # <-- thêm
-            first_soup = soup   # <-- thêm
+        if first_soup is None:
+            first_soup = soup
 
         text = extract_text_from_pre(soup)
         if text:
@@ -140,7 +136,6 @@ def run_scraper(start_url: str):
             print("    [!] Không lấy được nội dung chương. Dừng scraper.")
             break
 
-        # Lấy dòng đầu làm tên file
         title = extract_title_from_header(first_soup) or sanitize_filename(content)
         file_path = os.path.join(OUTPUT_DIR, f"{title}.txt")
 
@@ -149,7 +144,6 @@ def run_scraper(start_url: str):
         
         print(f"    [ OK ] Đã lưu: {title}.txt")
 
-        # Tìm link chương kế tiếp
         next_chapter_url = get_next_url(soup)
         if next_chapter_url and next_chapter_url != current_url:
             current_url = next_chapter_url
@@ -158,7 +152,7 @@ def run_scraper(start_url: str):
         else:
             print("\n--- Hoàn tất hoặc không tìm thấy chương tiếp theo ---")
             break
-        
+
 
 def load_codes(file_path="chapters.txt"):
     with open(file_path, "r", encoding="utf-8") as f:

@@ -20,11 +20,9 @@ results = []
 for a in ul.find_all("a", class_="on-navigate"):
     href = a.get("href", "")
 
-    # lấy code đầu (số)
     match = re.search(r"/(\d+)-", href)
     code = match.group(1) if match else None
 
-    # lấy text
     title_div = a.find("div", class_="part-title")
     text = title_div.get_text(strip=True) if title_div else ""
 
