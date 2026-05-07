@@ -146,8 +146,8 @@ def run_scraper_for_code(driver, code: str):
         content, last_soup, first_soup = scrape_chapter_content(driver, current_url)
 
         if not content or not first_soup:
-            print("    [!] Không có nội dung. Dừng.")
-            break
+            print("    [!] Không có nội dung. Dừng toàn bộ.")
+            return False
 
         title = extract_title_from_header(first_soup) or sanitize_filename(content)
         file_path = os.path.join(OUTPUT_DIR, f"{title}.txt")
@@ -169,6 +169,8 @@ def run_scraper_for_code(driver, code: str):
             print("    --- Hết chapter ---")
             break
 
+    return True
+
 
 def load_codes(file_path: str = "chapters.txt") -> list[str]:
     with open(file_path, "r", encoding="utf-8") as f:
@@ -185,8 +187,10 @@ if __name__ == "__main__":
     try:
         for i, code in enumerate(codes):
             print(f"\n=== Code {i+1}/{len(codes)}: {code} ===")
-            run_scraper_for_code(driver, code)
-            # Nghỉ giữa các code
+            success = run_scraper_for_code(driver, code)
+            if not success:
+                print("\n[!] Dừng toàn bộ do lỗi.")
+                break
             if i < len(codes) - 1:
                 time.sleep(random.uniform(3, 6))
     finally:
