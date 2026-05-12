@@ -17,6 +17,11 @@ from urllib.parse import urljoin
 OUTPUT_DIR = "wattpad_chapters"
 
 
+def normalize_dots(text: str) -> str:
+    # Replace sequences of 6+ dots with exactly 5 dots
+    return re.sub(r'\.{6,}', '.....', text)
+
+
 def get_driver():
     options = Options()
     # Bỏ comment dòng dưới để chạy ẩn không hiện cửa sổ Chrome
@@ -182,10 +187,10 @@ def run_scraper_for_code(driver, code: str):
         if os.path.exists(file_path):
             # file_path = os.path.join(OUTPUT_DIR, f"{title}_{count}.txt")
             print(f'    [!] File đã tồn tại: {os.path.basename(file_path)}.')
-            break
+            return False
 
         with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content)
+            f.write(normalize_dots(content))
 
         print(f"    [OK] Lưu: {os.path.basename(file_path)}")
 
@@ -218,7 +223,7 @@ if __name__ == "__main__":
             print(f"\n=== Code {i+1}/{len(codes)}: {code} ===")
             success = run_scraper_for_code(driver, code)
             if not success:
-                print("\n[!] Dừng toàn bộ do lỗi.")
+                print("\n[!] Dừng toàn bộ do lỗi hoặc phát hiện file ghi đã tồn tại.")
                 break
             if i < len(codes) - 1:
                 time.sleep(random.uniform(3, 6))
