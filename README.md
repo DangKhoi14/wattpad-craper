@@ -82,7 +82,7 @@ This will:
 
 ---
 
-### Step 3 — Combine Multi-Part Chapters
+### Step 3 — Combine Multi-Part Chapters (Optional)
 
 Wattpad splits long chapters into parts (e.g. `Chapter 1191 (1)`, `Chapter 1192 (2)`...). `combining.py` merges them:
 
@@ -114,17 +114,6 @@ wattpad_combined/
 
 ---
 
-## Utility — Normalize Dots in Existing Files
-
-If you have already-downloaded `.txt` files with long dot sequences, run:
-
-```bash
-python normalize_dots.py wattpad_chapters
-```
-
-Replaces any run of 4+ dots with exactly 3 dots (`"..."`). Unlike the scraper (which uses 5-dot normalization at write time), this standalone utility targets pre-existing files. Edit the regex in `normalize_dots.py` if you need a different threshold.
-
----
 
 ## Configuration
 
